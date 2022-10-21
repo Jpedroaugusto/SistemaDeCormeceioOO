@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Usuários</title>
+
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a>Cadastros</a></li>
+                <ul>
+                    <li><a href="usuarios.html">Usuários</a></li>
+                    <li><a>Produtos</a></li>
+                    <li><a>Empresa</a></li>
+                    <li><a>Fornecedor</a></li>
+                    <li><a>Grupos</a></li>
+                    <li><a>Vendas</a></li>
+                    <li><a>Estoque</a></li>
+                </ul>
+            </ul>
+            <ul>
+                <li>Usuarios</li>
+                <ul>
+                    <li><a>Produtos</a></li>
+                    <li><a>Empresa</a></li>
+                    <li><a>Fornecedor</a></li>
+                    <li><a>Grupos</a></li>
+                    <li><a>Vendas</a></li>
+                    <li><a>Estoque</a></li>
+                </ul>
+            </ul>
+        </nav>
+        <div id="date"></div>
+    </header>
+    
+    <main>
+        <div id="cadastro">
+            <form onsubmit="return false">
+                <fieldset>
+                    <div>
+                        <label>Nome</label>
+                        <input type="text" placeholder="Digite seu nome" id="field-nome-cadastro">
+                    </div>
+                    <div>
+                        <label>CPF</label>
+                        <input type="text" placeholder="Digite seu CPF" id="field-cpf-cadastro">
+                    </div>
+                    <div>
+                        <label>Email</label>
+                        <input type="text" placeholder="Digite seu email" id="field-email-cadastro">
+                    </div>
+                    <div id="alert-cadastro">
+
+                    </div>
+                    <button id="btn-cancelar-cadastro">Cancelar</button>
+                    <button id="btn-cadastrar">Cadastrar</button>
+                </fieldset>
+            </form>
+            <form onsubmit="return false">
+                <fieldset>
+                    <div id="painel-usuario">
+
+                    </div>
+                    <div>
+                        <label>Nome</label>
+                        <input type="text" placeholder="Digite seu novo nome" id="field-nome-atualizar">
+                    </div>
+                    <div>
+                        <label>Email</label>
+                        <input type="text" placeholder="Digite seu novo email" id="field-email-atualizar">
+                    </div>
+                    <div id="alert-atualizar">
+
+                    </div>
+                    <button id="btn-cancelar-atualizar">Cancelar</button>
+                    <button id="btn-deletar-atualizar">Deletar</button>
+                    <button id="btn-atualizar">Atualizar</button>
+                </fieldset>
+            </form>
+        </div>
+        <div>
+            <table border="2">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody id="table">
+
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <footer>
+        <div id="time">
+
+        </div>
+    </footer>
+
+    <script src="usuarios.js"></script>
+
+    <script src="assets/js/date.js"></script>
+</body>
+</html>
