@@ -32,14 +32,14 @@ class LocalDb {
         
     }
     
-    salvarUsuario(userDb) {
+    registrar(userDb) {
         let id = localStorage.length;
         id++;
         localStorage.setItem(id, JSON.stringify(userDb));
-        
     }
+    
 
-    atulizarUsuario(id,nome,cpf,email) {
+    atulizar(id,nome,cpf,email) {
         if(nome != "") {
             let usuario = {
                 nome: nome,
@@ -51,7 +51,7 @@ class LocalDb {
         }
     }
 
-    deletarUsuario(id) {
+    deletar(id) {
         localStorage.removeItem(id);
     }
 }
@@ -70,7 +70,7 @@ document.getElementById('btn-atualizar').setAttribute("onclick", `setAtualizar()
 
 // CRIAÇÃO DOS OBJETOS
 let usuario = new Usuario();
-let db = new LocalDb();
+let localDb = new LocalDb();
 
 function cadastrar() {
 
@@ -78,8 +78,10 @@ function cadastrar() {
 
     
     if(usuario.validarCampos(cadastro.fieldNome, cadastro.fieldCPF, cadastro.fieldEmail) == true) {
-
-        db.salvarUsuario(usuario.cadastrarUsuario(cadastro.fieldNome, cadastro.fieldCPF, cadastro.fieldEmail));
+        
+        let userDb = usuario.cadastrarUsuario(cadastro.fieldNome, cadastro.fieldCPF, cadastro.fieldEmail)
+        localDb.registrar(userDb);
+        
         limparCampos();
         location.reload();
 
@@ -122,10 +124,15 @@ function limparCampos(secao) {
         document.getElementById('field-nome-cadastro').value = "";
         document.getElementById('field-cpf-cadastro').value = "";
         document.getElementById('field-email-cadastro').value = "";
+
+        document.getElementById('alert-cadastro').innerHTML = "";
     }
     else if(secao = 'atualizar') {
         document.getElementById('field-nome-atualizar').value = "";
         document.getElementById('field-email-atualizar').value = "";
+
+        document.getElementById('painel-usuario').innerHTML = "";
+        document.getElementById('alert-atualizar').innerHTML = "";
     }
 }
 
@@ -172,15 +179,15 @@ function setAtualizar(i) {
     let usuarioS = JSON.parse(localStorage.getItem(i));
     
     if(atualizar.fieldNome != "" && atualizar.fieldEmail != "") {
-        db.atulizarUsuario(i, atualizar.fieldNome, usuarioS.cpf, atualizar.fieldEmail);
+        localDb.atulizar(i, atualizar.fieldNome, usuarioS.cpf, atualizar.fieldEmail);
         location.reload();
     }
     else if(atualizar.fieldNome != "") {
-        db.atulizarUsuario(i, atualizar.fieldNome, usuarioS.cpf, usuarioS.nome);
+        localDb.atulizar(i, atualizar.fieldNome, usuarioS.cpf, usuarioS.nome);
         location.reload();
     }
     else if(atualizar.fieldEmail != "") {
-        db.atulizarUsuario(i, usuarioS.nome, usuarioS.cpf, atualizar.fieldEmail);
+        localDb.atulizar(i, usuarioS.nome, usuarioS.cpf, atualizar.fieldEmail);
         location.reload();
     }
     
@@ -199,14 +206,14 @@ function cancelar(i) {
     document.getElementById('btn-deletar-atualizar').removeAttribute("onclick", `deletar(${i})`);
     
     document.getElementById('painel-usuario').innerHTML = "";
-    document.getElementById('alert-atualizar').innerHTML = 'Apague o último da tabela';
+    document.getElementById('alert-atualizar').innerHTML = "";
 
     limparCampos(atualizar);
 }
 
 function deletar(i) {
     if(i == localStorage.length){
-        db.deletarUsuario(i);
+        localDb.deletar(i);
         location.reload();
     } else {
         document.getElementById('alert-atualizar').innerHTML = 'Apague o último item da tabela';
