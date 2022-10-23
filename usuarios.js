@@ -98,7 +98,7 @@ function mostrarTabela(valor,usuarioFiltrado){
             let key = localStorage.key(i);
             let usuario = JSON.parse(localStorage.getItem(key));
             tr += `<tr onclick="atualizar(${key})">`;
-            tr += `<td>${i+1}</td>`;
+            tr += `<th>N° ${i < 10 ? '0'+(i+1) : i}</td>`;
             tr += `<td>${usuario.nome}</td>`;
             tr += `<td>${usuario.cpf}</td>`;
             tr += `<td>${usuario.email}</td>`;
@@ -108,8 +108,11 @@ function mostrarTabela(valor,usuarioFiltrado){
         let usuario = localDb.pesquisar(usuarioFiltrado);
         if(usuario != "") {
             for(let i = 0; i < usuario.length; i++) {
+                tr += `<tr>`;
+                tr += `<td colspan="4">Todos os resultados de <strong>"${usuarioFiltrado}"</strong></td>`;
+                tr += `</tr>`;
                 tr += `<tr onclick="atualizar(${usuario[i].cpf})">`;
-                tr += `<td>${i}</td>`;
+                tr += `<th>N° ${i < 10 ? '0'+(i+1) : i}</td>`;
                 tr += `<td>${usuario[i].nome}</td>`;
                 tr += `<td>${usuario[i].cpf}</td>`;
                 tr += `<td>${usuario[i].email}</td>`;
