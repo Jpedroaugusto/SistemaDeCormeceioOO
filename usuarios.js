@@ -106,11 +106,18 @@ function mostrarTabela(valor,usuarioFiltrado){
         }
     } else {
         let usuario = localDb.pesquisar(usuarioFiltrado);
-        for(let i = 0; i < usuario.length; i++) {
-            tr += `<tr onclick="atualizar(${usuario[i].cpf})">`;
-            tr += `<td>${usuario[i].nome}</td>`;
-            tr += `<td>${usuario[i].cpf}</td>`;
-            tr += `<td>${usuario[i].email}</td>`;
+        if(usuario != "") {
+            for(let i = 0; i < usuario.length; i++) {
+                tr += `<tr onclick="atualizar(${usuario[i].cpf})">`;
+                tr += `<td>${i}</td>`;
+                tr += `<td>${usuario[i].nome}</td>`;
+                tr += `<td>${usuario[i].cpf}</td>`;
+                tr += `<td>${usuario[i].email}</td>`;
+                tr += `</tr>`;
+            }
+        } else {
+            tr += `<tr>`;
+            tr += `<td colspan="4">Não a nenhum usuário cadastrado com <strong>"${usuarioFiltrado}"</strong></td>`;
             tr += `</tr>`;
         }
     }
