@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    
+    <link rel="stylesheet" href="assets/styles/style.css">
+    
+    
     <title>Usuários</title>
-
+    
 </head>
 <body>
     <header>
@@ -48,14 +51,14 @@
                     </div>
                     <div>
                         <label>CPF</label>
-                        <input type="text" placeholder="Digite seu CPF" id="field-cpf-cadastro">
+                        <input type="text" placeholder="Digite seu CPF" id="field-cpf-cadastro" maxlength="14">
                     </div>
                     <div>
                         <label>Email</label>
-                        <input type="text" placeholder="Digite seu email" id="field-email-cadastro">
+                        <input type="email" placeholder="Digite seu email" id="field-email-cadastro">
                     </div>
                     <div id="alert-cadastro">
-
+                        
                     </div>
                     <button id="btn-cancelar-cadastro">Cancelar</button>
                     <button id="btn-cadastrar">Cadastrar</button>
@@ -64,7 +67,7 @@
             <form onsubmit="return false">
                 <fieldset>
                     <div id="painel-usuario">
-
+                        
                     </div>
                     <div>
                         <label>Nome</label>
@@ -72,10 +75,10 @@
                     </div>
                     <div>
                         <label>Email</label>
-                        <input type="text" placeholder="Digite seu novo email" id="field-email-atualizar">
+                        <input type="email" placeholder="Digite seu novo email" id="field-email-atualizar">
                     </div>
                     <div id="alert-atualizar">
-
+                        
                     </div>
                     <button id="btn-cancelar-atualizar">Cancelar</button>
                     <button id="btn-deletar-atualizar">Deletar</button>
@@ -84,6 +87,11 @@
             </form>
         </div>
         <div>
+            <div>
+                <label>Pesquisa</label>
+                <input type="text" id="field-pesquisar" placeholder="Digite o nome de usuário">
+                <button id="btn-pesquisar">pesquisar</button>
+            </div>
             <table border="2">
                 <thead>
                     <tr>
@@ -94,13 +102,13 @@
                     </tr>
                 </thead>
                 <tbody id="table">
-
+                    
                 </tbody>
             </table>
         </div>
-
+        
     </main>
-
+    
     <footer>
         <div id="time">
 
@@ -108,7 +116,7 @@
     </footer>
 
     <script src="usuarios.js"></script>
-
     <script src="assets/js/date.js"></script>
+    <script src="assets/js/maskcpf.js"></script>
 </body>
 </html>
