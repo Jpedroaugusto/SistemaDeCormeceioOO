@@ -1,262 +1,318 @@
+class LocalDb {
+    storage = localStorage;
+    usuarios = Array();
+
+    constructor() {}
+
+    registrar(chaveStorage,usuario) {
+        if(this.iniciarDados(chaveStorage,usuario)) {
+            this.usuarios = this.retornaDados(chaveStorage);
+            this.usuarios.push(usuario);
+            this.storage.setItem(chaveStorage, JSON.stringify(this.usuarios));
+        }
+
+    }
+
+    atulizar(indice,chave,nome,email,chaveStorage) {
+        let objUsuario = {
+            nome: nome,
+            cpf: chave,
+            email: email
+        }
+
+        this.usuarios = this.retornaDados(chaveStorage);
+        this.usuarios[indice] = objUsuario;
+        this.storage.setItem(chaveStorage, JSON.stringify(this.usuarios));
+    }
+    
+    deletar(indice,chaveStorage) {
+        this.usuarios = this.retornaDados(chaveStorage);
+        this.usuarios.splice(indice, 1);
+        this.storage.setItem(chaveStorage, JSON.stringify(this.usuarios));
+    }
+
+    iniciarDados(chaveStorage,usuario) {
+        if(!this.storage.key(chaveStorage)) {
+            this.usuarios.push(usuario);
+            this.storage.setItem(chaveStorage, JSON.stringify(this.usuarios));
+            return false;
+        }
+        return true;
+    }
+    
+    retornaDados(chaveStorage) {
+        return JSON.parse(this.storage.getItem(chaveStorage));
+    }
+    
+}
+
 class Usuario {
     constructor() {}
-    cadastrarUsuario(nome,cpf,email) {
-        let busca = this.nomeFormatado(nome)
+    
+    usuario(nome,cpf,email) {
         let usuario = {
             nome: nome,
             cpf: cpf,
-            email: email,   
-            busca: busca
+            email: email 
         }
-
         return usuario;
     }
-
-    nomeFormatado(nome) {
-        let nomeBusca = nome.split(" ").join("");
-        nomeBusca = nomeBusca.toLowerCase();
-        nomeBusca = nomeBusca.normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, '');
-        return nomeBusca
-    }
-    
-    validarCampos(nome,cpf,email) {
-        if(nome != "" && cpf != "" && email != "") {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }
 
-class LocalDb {
+class Funcoes {
+    storage = localStorage;
+
+    registroBusca = Array();
+    registrosGerais = Array();
+    registrosNomes = Array();
+    registrosFiltrados = Array();
+    
     constructor() {}
 
-    registrar(userDb) {
-        localStorage.setItem(userDb.cpf, JSON.stringify(userDb));
-    }
+    pesquisar(filtro, chaveStorage) {
+        this.registrosGerais = JSON.parse(this.storage.getItem(chaveStorage));
+        let busca = this.nomeFormatado(filtro);
 
-    atulizar(chave,nome,email) {
-        let busca = this.nomeFormatado(nome)
-        if(nome != "") {
-            let usuario = {
-                nome: nome,
-                cpf: chave,
-                email: email,
-                busca: busca
-            }
-            localStorage.setItem(chave, JSON.stringify(usuario));
+        for(let i = 0; i < this.registrosGerais.length; i++) {
+            this.registrosNomes.push(this.registrosGerais[i].nome);
+            this.registrosGerais[i].nome = this.nomeFormatado(this.registrosNomes[i]);
+            this.registrosGerais[i].nome.push(this.registrosNomes[i]);
         }
+
+        for(let i = 0; i < busca.length; i++) {
+            this.registrosFiltrados = this.registrosGerais.filter(function(registros) {return registros.nome[i] == busca[i]});
+        }
+        
+        return this.registrosFiltrados;
     }
 
     nomeFormatado(nome) {
         let nomeBusca = nome.split(" ").join("");
         nomeBusca = nomeBusca.toLowerCase();
         nomeBusca = nomeBusca.normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, '');
-        return nomeBusca
-    }
-    
-    pesquisar(pesquisa) {
-        let registros = Array()
-        let busca = this.nomeFormatado(pesquisa)
-        for(let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i);
-            let usuario = JSON.parse(localStorage.getItem(key));
-            registros.push(usuario);
-        }
-        return registros.filter(function(i) { return i.busca == busca})
-    }
-
-    deletar(id) {
-        localStorage.removeItem(id);
+        
+        this.registroBusca = Array.from(nomeBusca);
+        return this.registroBusca;
     }
 }
 
 
-// MOSTRANDO O VALOR DA TABELA QUANDO A PÁGINA É CARREGADA
+
+
+
 window.addEventListener('load', load);
 
+let objLocalDB = new LocalDb();
+let objUsuario = new Usuario();
+let objFuncao = new Funcoes();
+
+let chaveStorage = 'usuarios';
+
+
+
+
+
+// ------- DOCUMENT OBJECT MODEL -------
+
+// DIVISÕES
+const tabela = document.getElementById('table');
+const painelUsuario = document.getElementById('painel-usuario');
+
+const alertaAtulizacao = document.getElementById('alert-atualizar');
+const alertaCadastro = document.getElementById('alert-cadastro');
+// CAMPOS
+const campoCadastroNome = document.getElementById('field-nome-cadastro');
+const campoCadastroCPF = document.getElementById('field-cpf-cadastro');
+const campoCadastroEmail = document.getElementById('field-email-cadastro');
+
+const campoAtualizacaoNome = document.getElementById('field-nome-atualizar');
+const campoAtualizacaoEmail = document.getElementById('field-email-atualizar');
+
+const campoPesquisa = document.getElementById("field-pesquisar")
+
+
+// BOTÕES
+const botaoCancelarCadastro = document.getElementById('btn-cancelar-cadastro')
+const botaoCadastrar = document.getElementById('btn-cadastrar')
+
+const botaoDeletar = document.getElementById('btn-deletar');
+
+const botaoCancelarAtualizacao = document.getElementById('btn-cancelar-atualizar')
+const botaoAtualizar = document.getElementById('btn-atualizar')
+
+// ------- DOCUMENT OBJECT MODEL -------
+
+
+
+
+
+
 function load() {
-    // SETANDO ATRIBUTOS PRINCIPAIS
-    document.getElementById('btn-cancelar-cadastro').setAttribute("onclick","limparCampos('cadastro')");
-    document.getElementById('btn-cadastrar').setAttribute("onclick","cadastrar()");
-    document.getElementById('btn-cancelar-atualizar').setAttribute("onclick","limparCampos('atualizar')");
-    document.getElementById('btn-atualizar').setAttribute("onclick", `setAtualizar()`);
-    document.getElementById("field-pesquisar").addEventListener("keyup", pesquisar)
-    
-    
-    mostrarTabela('null');
+    botaoCancelarCadastro.setAttribute("onclick","limparCampos('cadastro')");
+    botaoCadastrar.setAttribute("onclick","cadastrar()");
+    botaoCancelarAtualizacao.setAttribute("onclick","limparCampos('atualizar')");
+    botaoAtualizar.setAttribute("onclick", `setAtualizar()`);
+
+    campoPesquisa.setAttribute("onkeyup", "tabelaFiltrada()");
+    tabelaCompleta();
 }
 
-// CRIAÇÃO DOS OBJETOS
-let usuario = new Usuario();
-let localDb = new LocalDb();
 
-function mostrarTabela(valor,usuarioFiltrado){
-    let tr = "";
-    if(valor != 'pesquisa') {
-        for(let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i);
-            let usuario = JSON.parse(localStorage.getItem(key));
-            tr += `<tr onclick="atualizar(${key})">`;
+
+
+
+function tabelaCompleta(){
+    if(!campoPesquisa.value) {
+        let tr = ""
+        let usuarios = objLocalDB.retornaDados(chaveStorage);
+        
+        for(let i = 0; i < usuarios.length; i++) {
+            tr += `<tr onclick="atualizar(${i})">`;
             tr += `<th>N° ${i < 10 ? '0'+(i+1) : i}</td>`;
-            tr += `<td>${usuario.nome}</td>`;
-            tr += `<td>${usuario.cpf}</td>`;
-            tr += `<td>${usuario.email}</td>`;
+            tr += `<td>${usuarios[i].nome}</td>`;
+            tr += `<td>${usuarios[i].cpf}</td>`;
+            tr += `<td>${usuarios[i].email}</td>`;
             tr += `</tr>`;
         }
-    } else {
-        let usuario = localDb.pesquisar(usuarioFiltrado);
-        if(usuario != "") {
-            for(let i = 0; i < usuario.length; i++) {
-                tr += `<tr>`;
-                tr += `<td colspan="4">Todos os resultados de <strong>"${usuarioFiltrado}"</strong></td>`;
-                tr += `</tr>`;
-                tr += `<tr onclick="atualizar(${usuario[i].cpf})">`;
-                tr += `<th>N° ${i < 10 ? '0'+(i+1) : i}</td>`;
-                tr += `<td>${usuario[i].nome}</td>`;
-                tr += `<td>${usuario[i].cpf}</td>`;
-                tr += `<td>${usuario[i].email}</td>`;
-                tr += `</tr>`;
-            }
-        } else {
-            tr += `<tr>`;
-            tr += `<td colspan="4">Não a nenhum usuário cadastrado com <strong>"${usuarioFiltrado}"</strong></td>`;
+
+        tabela.innerHTML = tr;
+    }
+}
+
+
+
+function tabelaFiltrada(){
+    let filtro = campoPesquisa.value;
+    if(filtro) {
+        let usuarios = objFuncao.pesquisar(filtro,chaveStorage);
+        let tr = ""
+        for(let i = 0; i < usuarios.length; i++) {
+            tr += `<tr onclick="atualizar(${i})">`;
+            tr += `<th>N° ${i < 10 ? '0'+(i+1) : i}</td>`;
+            tr += `<td>${usuarios[i].nome[usuarios[i].nome.length - 1]}</td>`;
+            tr += `<td>${usuarios[i].cpf}</td>`;
+            tr += `<td>${usuarios[i].email}</td>`;
             tr += `</tr>`;
         }
-    }
-    document.getElementById('table').innerHTML = tr;
-}
 
-
-// FUNÇÔES DE DECISÕES
-function cadastrar() {
-    let cadastro = getCamposCadastro()
-    if(usuario.validarCampos(cadastro.fieldNome, cadastro.fieldCPF, cadastro.fieldEmail) == true) {
-        let userDb = usuario.cadastrarUsuario(cadastro.fieldNome, cadastro.fieldCPF, cadastro.fieldEmail)
-        localDb.registrar(userDb);
-        mostrarTabela()
-        limparCampos('cadastro');
+        tabela.innerHTML = tr;
     } else {
-        if(cadastro.fieldNome == "") {
-            document.getElementById('alert-cadastro').innerHTML = `Prencha o seu nome`;
-        }
-        else if(cadastro.fieldCPF == ""){
-            document.getElementById('alert-cadastro').innerHTML = `Prencha o seu CPF`;
-        }   
-        else if(cadastro.fieldEmail == ""){
-            document.getElementById('alert-cadastro').innerHTML = `Prencha o seu email`;
-        } 
+        tabelaCompleta()
     }
 }
 
-function getCamposCadastro() {
-    let cadastro = {
-        fieldNome: document.getElementById('field-nome-cadastro').value,
-        fieldCPF: document.getElementById('field-cpf-cadastro').value,
-        fieldEmail: document.getElementById('field-email-cadastro').value
+
+
+function cadastrar() { 
+    if( getCamposCadastro() ) {
+        objLocalDB.registrar( 'usuarios', getCamposCadastro() )
+        location.reload()
     }
-    return cadastro;
+}
+
+
+function atributos(usuarioID) {
+    botaoCancelarAtualizacao.setAttribute("onclick", `cancelar(${usuarioID})`);
+    botaoAtualizar.setAttribute("onclick", `setAtualizar(${usuarioID})`);
+    botaoDeletar.setAttribute("onclick", `deletar(${usuarioID})`);
 }
 
 
 
-
-
-function atualizar(chave) {
-    console.log(chave)
-    document.getElementById('btn-cancelar-atualizar').setAttribute("onclick", `cancelar(${chave})`);
-    document.getElementById('btn-deletar-atualizar').setAttribute("onclick", `deletar(${chave})`);
-    document.getElementById('btn-atualizar').setAttribute("onclick", `setAtualizar(${chave})`);
+function atualizar(usuarioID) {
+    limparCampos( 'atualizar' )
+    atributos(usuarioID);
     
-    limparCampos('atualizar')
-
-    let usuario = JSON.parse(localStorage.getItem(chave));
+    let usuario = objLocalDB.retornaDados(chaveStorage);
     
-    document.getElementById('painel-usuario').innerHTML = ``;
-    document.getElementById('painel-usuario').innerHTML += `Nome de usuario: <strong>${usuario.nome}</strong><br>`;
-    document.getElementById('painel-usuario').innerHTML += `CPF: <strong>${usuario.cpf}</strong><br>`;
-    document.getElementById('painel-usuario').innerHTML += `Email: <strong>${usuario.email}</strong><br><br>`;
+    painelUsuario.innerHTML = ``;
+    painelUsuario.innerHTML += `Nome de usuario: <strong>${usuario[usuarioID].nome}</strong><br>`;
+    painelUsuario.innerHTML += `CPF: <strong>${usuario[usuarioID].cpf}</strong><br>`;
+    painelUsuario.innerHTML += `Email: <strong>${usuario[usuarioID].email}</strong><br><br>`;
+    
+    campoAtualizacaoNome.value = usuario[usuarioID].nome;
+    campoAtualizacaoEmail.value = usuario[usuarioID].email;
 }
 
-function setAtualizar(chave) {
+function setAtualizar(usuarioID) {
     let atualizar = getCamposAtualizacao()
-    let usuarioS = JSON.parse(localStorage.getItem(chave));
+    let usuario = objLocalDB.retornaDados(chaveStorage);
     
     if(atualizar.fieldNome != "" && atualizar.fieldEmail != "") {
-        localDb.atulizar(chave, atualizar.fieldNome, atualizar.fieldEmail);
-        cancelar();
+        objLocalDB.atulizar(usuarioID,usuario[usuarioID].cpf, atualizar.fieldNome, atualizar.fieldEmail,chaveStorage);
+        location.reload()
     }   
     else if(atualizar.fieldNome != "" && atualizar.fieldEmail == "") {
-        localDb.atulizar(chave, atualizar.fieldNome, usuarioS.email);
-        cancelar();
+        objLocalDB.atulizar(usuarioID,usuario[usuarioID].cpf, atualizar.fieldNome, usuario[usuarioID].email,chaveStorage);
+        location.reload()
     }
     else if(atualizar.fieldEmail != "" && atualizar.fieldNome == "") {
-        localDb.atulizar(chave, usuarioS.nome, atualizar.fieldEmail);
-        cancelar();
+        objLocalDB.atulizar(usuarioID,usuario[usuarioID].cpf, usuario[usuarioID].nome, atualizar.fieldEmail,chaveStorage);
+        location.reload()
     }
     if(atualizar.fieldNome == "" && atualizar.fieldEmail == "") {
-        document.getElementById('alert-atualizar').innerHTML = 'Preencha um campo';
+        alertaAtulizacao.innerHTML = 'Preencha um campo';
     }
-    if(chave == null) {
-        document.getElementById('alert-atualizar').innerHTML = 'Escolha um item da tabela';
-    }
-    mostrarTabela('null')
-}
-
-
-function pesquisar() {
-    if(document.getElementById("field-pesquisar").value != "") {
-        mostrarTabela('pesquisa',document.getElementById("field-pesquisar").value);
-    } else {
-        mostrarTabela('null')
+    if(usuarioID == null) {
+        alertaAtulizacao.innerHTML = 'Escolha um item da tabela';
     }
 }
 
-function deletar(chave) {
+function deletar(usuarioID) {
+    objLocalDB.deletar(usuarioID,chaveStorage);
+    location.reload()
+}
+
+function cancelar(usuarioID) {
+    botaoAtualizar.removeAttribute("onclick", `setAtualizar(${usuarioID})`);
+    botaoDeletar.removeAttribute("onclick", `deletar(${usuarioID})`);
     
-    if(chave != "") {
-        localDb.deletar(chave);
-        limparCampos('atualizar')
-        mostrarTabela('null')
-        cancelar(chave);
-    } else {
-        document.getElementById('alert-atualizar').innerHTML = 'Escolha um item da tabela';
-    }
-}
-
-function cancelar(chave) {
-    document.getElementById('btn-atualizar').removeAttribute("onclick", `setAtualizar(${chave})`);
-    document.getElementById('btn-deletar-atualizar').removeAttribute("onclick", `deletar(${chave})`);
-    
-    document.getElementById('painel-usuario').innerHTML = "";
-    document.getElementById('alert-atualizar').innerHTML = "";
+    painelUsuario.innerHTML = "";
+    alertaAtulizacao.innerHTML = "";
     
     limparCampos('atualizar');
 }
 
 
 // FUNÇÕES DE CAMPOS
+function getCamposCadastro() {
+    let objCampos = objUsuario.usuario( campoCadastroNome.value, campoCadastroCPF.value, campoCadastroEmail.value )
+
+    for(let i = 0; i < Object.values( objCampos ).length; i++) {
+        if( !Object.values( objCampos )[i] ) return false
+    }
+
+    return objCampos
+}
+
+
+
 function getCamposAtualizacao() {
     let atualizacao = {
-        fieldNome: document.getElementById('field-nome-atualizar').value,
-        fieldEmail: document.getElementById('field-email-atualizar').value
+        fieldNome: campoAtualizacaoNome.value,
+        fieldEmail: campoAtualizacaoEmail.value
     }
     return atualizacao;
 }
 
+
+
 function limparCampos(secao) {
     if(secao == 'cadastro') {
-        document.getElementById('field-nome-cadastro').value = "";
-        document.getElementById('field-cpf-cadastro').value = "";
-        document.getElementById('field-email-cadastro').value = "";
-
-        document.getElementById('alert-cadastro').innerHTML = "";
+        campoCadastroNome.value = "";
+        campoCadastroCPF.value = "";
+        campoCadastroEmail.value = "";
+        
+        alertaCadastro.innerHTML = "";
     }
-
+    
     else if(secao = 'atualizar') {
-        document.getElementById('field-nome-atualizar').value = "";
-        document.getElementById('field-email-atualizar').value = "";
-        document.getElementById('painel-usuario').innerHTML = "";
-        document.getElementById('alert-atualizar').innerHTML = "";
+        campoAtualizacaoNome.value = "";
+        campoAtualizacaoEmail.value = "";
+        
+        painelUsuario.innerHTML = "";
+        alertaAtulizacao.innerHTML = "";
     }
 }
+
+
